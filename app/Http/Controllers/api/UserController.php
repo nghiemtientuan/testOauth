@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -21,11 +22,17 @@ class UserController extends Controller
             ]
         )) {
             $user = Auth::user();
-            $success['token'] = $user->createToken($this->createTokenSeed)->accessToken;
+
+            $token = $user->createToken($this->createTokenSeed);
 
             return response()->json(
                 [
-                    'success' => $success
+                    'success' => true,
+                    'access_token' => $token->accessToken,
+                    'token_type' => 'Bearer',
+                    'expires_at' => Carbon::parse(
+                        $token->token->expires_at
+                    )->toDateTimeString()
                 ],
                 200
             );
